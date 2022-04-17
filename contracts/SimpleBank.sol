@@ -46,11 +46,19 @@ contract SimpleBank {
     // Typically, called when invalid data is sent
     // Added so ether sent to this contract is reverted if the contract fails
     // otherwise, the sender's money is transferred to contract
-    function () external payable {
+
+    // for compiler version 0.5.x
+    // function () external payable {
+    //   revert();
+    // }
+
+    // for compiler version 0.8.x
+    fallback() external payable {
         revert();
     }
 
-    // receive() external payable {}
+    // for compiler version 0.8.x
+    receive() external payable {}
 
     // function enrolled(address user) public view returns (bool) {
 
@@ -123,10 +131,15 @@ contract SimpleBank {
       //    sender's balance
       // owner.call{value: amount}("");
       //  (msg.sender).call{value: withdrawAmount}("");
-        (bool success, bytes memory returnedData) = msg.sender.call.value(withdrawAmount)("");
-        if (success){
+      
+      // for compiler version 0.5x
+      // (bool success, ) = msg.sender.call.value(withdrawAmount)("");
+
+      // for compiler version 0.8.x
+      (bool success, ) = msg.sender.call{value:withdrawAmount}("");
+      if (success){
           balances[msg.sender] -= withdrawAmount;
-        }
+      }
 
 
       // 3. Emit the appropriate event for this message
